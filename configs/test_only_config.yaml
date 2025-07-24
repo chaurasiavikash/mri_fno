@@ -1,0 +1,64 @@
+# Minimal test configuration
+data:
+  train_path: "/scratch/vchaurasia/fastmri_data/test"
+  val_path: "/scratch/vchaurasia/fastmri_data/test"
+  test_path: "/scratch/vchaurasia/fastmri_data/test"
+  acceleration: 4
+  center_fraction: 0.08
+  num_workers: 2
+  batch_size: 1
+  mask_type: "random"
+
+model:
+  name: "disco_neural_operator"
+  in_channels: 2
+  out_channels: 2
+  hidden_channels: 32  # Smaller for quick test
+  num_layers: 2        # Fewer layers for speed
+  modes: 6             # Fewer modes for speed
+  width: 32
+  dropout: 0.1
+  use_residual: true
+  activation: "gelu"
+
+training:
+  epochs: 1
+  learning_rate: 0.001  # Change from 1e-3 to 0.001 (explicit float)
+  weight_decay: 0.000001  # Change from 1e-6 to explicit float
+  scheduler: "cosine"
+  warmup_epochs: 0     # No warmup
+  gradient_clip: 1.0
+  mixed_precision: true
+  save_every: 1
+  validate_every: 1
+
+loss:
+  type: "combined"
+  l1_weight: 1.0
+  ssim_weight: 0.1
+  perceptual_weight: 0.0  # Disable for speed
+  data_consistency_weight: 0.5
+
+optimizer:
+  name: "adamw"
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  amsgrad: false
+
+evaluation:
+  metrics: ["psnr", "ssim", "nmse"]
+  save_images: true
+  num_test_images: 5
+
+system:
+  device: "cuda"
+  seed: 42
+  num_threads: 8
+  log_level: "INFO"
+
+logging:
+  use_wandb: false
+  project_name: "test_mri_reconstruction"
+  log_dir: "/home/vchaurasia/projects/mri_fno/outputs/test_logs"
+  save_model_dir: "/home/vchaurasia/projects/mri_fno/outputs/test_models"
+  results_dir: "/home/vchaurasia/projects/mri_fno/outputs/test_results"

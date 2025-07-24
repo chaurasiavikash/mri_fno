@@ -1,0 +1,107 @@
+2025-07-24 17:14:23,633 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 17:14:23,635 - train - INFO - Configuration: configs/test_only_config.yaml
+2025-07-24 17:14:23,637 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:14:31,067 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:14:31,069 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:14:31,226 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:14:31,227 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:14:31,371 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:14:31,371 - MRITrainer - INFO - Data loaders created: Train: 4092, Val: 4092, Test: 4092
+2025-07-24 17:16:16,766 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 17:16:16,767 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmp_xup7xyx.yaml
+2025-07-24 17:16:16,769 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:16,939 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:16,940 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:17,094 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:17,095 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:17,252 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:17,253 - MRITrainer - INFO - Data loaders created: Train: 4092, Val: 4092, Test: 4092
+2025-07-24 17:16:53,647 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 17:16:53,648 - train - INFO - Configuration: configs/test_only_config.yaml
+2025-07-24 17:16:53,649 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:53,956 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:53,957 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:55,175 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:55,176 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:16:55,538 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:16:55,539 - MRITrainer - INFO - Data loaders created: Train: 4092, Val: 4092, Test: 4092
+2025-07-24 17:20:26,175 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 17:20:26,175 - train - INFO - Configuration: configs/test_only_config.yaml
+2025-07-24 17:20:26,188 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:20:39,759 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:20:39,760 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:20:40,095 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:20:40,096 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 17:20:40,238 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 17:20:40,239 - MRITrainer - INFO - Data loaders created: Train: 4092, Val: 4092, Test: 4092
+2025-07-24 17:21:03,568 - MRITrainer - INFO - Trainer initialized with 261282 parameters
+2025-07-24 17:21:03,569 - MRITrainer - INFO - Starting training for 1 epochs
+2025-07-24 17:21:10,258 - train - ERROR - Training failed with error: cuFFT only supports dimensions whose sizes are powers of two when computing in half precision, but got a signal size of[640, 368]
+2025-07-24 17:21:10,320 - MRITrainer - INFO - Checkpoint saved: checkpoint_error.pth
+2025-07-24 23:20:58,056 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 23:20:58,068 - train - INFO - Configuration: configs/test_only_config.yaml
+2025-07-24 23:20:58,071 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:21:36,019 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:21:36,021 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:21:37,491 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:21:37,492 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:21:37,881 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:21:37,882 - MRITrainer - INFO - Data loaders created: Train: 4092, Val: 4092, Test: 4092
+2025-07-24 23:21:39,704 - MRITrainer - INFO - Trainer initialized with 261282 parameters
+2025-07-24 23:21:39,704 - MRITrainer - INFO - Starting training for 1 epochs
+2025-07-24 23:24:20,562 - train - INFO - Training interrupted by user
+2025-07-24 23:24:20,619 - MRITrainer - INFO - Checkpoint saved: checkpoint_interrupted.pth
+2025-07-24 23:29:17,361 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 23:29:17,361 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 23:29:17,362 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmphqf1j7i9.yaml
+2025-07-24 23:29:17,362 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmpxmt9z6ix.yaml
+2025-07-24 23:29:17,364 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-24 23:29:17,364 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-24 23:29:56,032 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-24 23:29:56,033 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-24 23:29:56,058 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-24 23:29:56,060 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-24 23:30:33,555 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-24 23:30:33,555 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-24 23:30:33,557 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:30:33,557 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:30:43,151 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:30:43,152 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-24 23:30:43,236 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:30:43,237 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-24 23:38:05,889 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-24 23:38:05,889 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmph4nx9ekq.yaml
+2025-07-24 23:38:05,891 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-24 23:38:31,601 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-24 23:38:31,604 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-24 23:38:57,635 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-24 23:38:57,637 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-24 23:39:10,508 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-24 23:39:10,509 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-24 23:39:27,191 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-24 23:39:27,191 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-24 23:39:31,291 - train - ERROR - Training failed with error: Caught RuntimeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/fetch.py", line 55, in fetch
+    return self.collate_fn(data)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 398, in default_collate
+    return collate(batch, collate_fn_map=default_collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 171, in collate
+    {
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 172, in <dictcomp>
+    key: collate(
+         ^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 155, in collate
+    return collate_fn_map[elem_type](batch, collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 272, in collate_tensor_fn
+    return torch.stack(batch, 0, out=out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: stack expects each tensor to be equal size, but got [15, 2, 640, 368] at entry 0 and [15, 2, 640, 372] at entry 1
+
+2025-07-24 23:39:31,719 - MRITrainer - INFO - Checkpoint saved: checkpoint_error.pth

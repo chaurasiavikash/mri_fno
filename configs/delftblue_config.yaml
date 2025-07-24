@@ -1,0 +1,71 @@
+# Data configuration
+data:
+  train_path: "/scratch/vchaurasia/fastmri_data/train"
+  val_path: "/scratch/vchaurasia/fastmri_data/val"
+  test_path: "/scratch/vchaurasia/fastmri_data/test" 
+  acceleration: 4
+  center_fraction: 0.08
+  num_workers: 4
+  batch_size: 1
+  mask_type: "random"
+  
+# Model Configuration
+model:
+  name: "disco_neural_operator"
+  in_channels: 2  # Real and imaginary parts
+  out_channels: 2
+  hidden_channels: 64
+  num_layers: 4
+  modes: 12  # Number of Fourier modes
+  width: 64
+  dropout: 0.1
+  use_residual: true
+  activation: "gelu"
+
+# Training Configuration
+training:
+  epochs: 100
+  learning_rate: 1e-4
+  weight_decay: 1e-6
+  scheduler: "cosine"
+  warmup_epochs: 5
+  gradient_clip: 1.0
+  mixed_precision: true
+  save_every: 10
+  validate_every: 1
+  
+# Loss Configuration
+loss:
+  type: "combined"
+  l1_weight: 1.0
+  ssim_weight: 0.1
+  perceptual_weight: 0.01
+  data_consistency_weight: 1.0
+  
+# Optimization
+optimizer:
+  name: "adamw"
+  betas: [0.9, 0.999]
+  eps: 1e-8
+  amsgrad: false
+
+# Evaluation
+evaluation:
+  metrics: ["psnr", "ssim", "nmse"]
+  save_images: true
+  num_test_images: 50
+
+# System Configuration
+system:
+  device: "cuda"
+  seed: 42
+  num_threads: 8
+  log_level: "INFO"
+  
+# Logging
+logging:
+  use_wandb: false
+  project_name: "mri_reconstruction"
+  log_dir: "logs"
+  save_model_dir: "outputs/models"
+  results_dir: "outputs/results"

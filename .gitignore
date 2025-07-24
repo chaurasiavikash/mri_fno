@@ -1,0 +1,341 @@
+# .gitignore for MRI Reconstruction Project
+# Keep only source code and essential configuration files
+
+#############################################################################
+# Large Data Files (Exclude)
+#############################################################################
+
+# MRI Data
+*.h5
+*.hdf5
+data/
+/scratch/
+fastmri_data/
+
+# Model Files (too large)
+*.pth
+*.pt
+*.ckpt
+*.pkl
+*.pickle
+models/
+checkpoints/
+saved_models/
+
+# Generated Images & Figures
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+figures/
+images/
+plots/
+visualizations/
+
+# Numpy arrays and processed data
+*.npy
+*.npz
+*.mat
+
+# Results and outputs (except logs)
+outputs/models/
+outputs/results/
+outputs/inference*/
+outputs/evaluation*/
+reconstruction*/
+inference*/
+evaluation*/
+results/
+
+#############################################################################
+# Keep Logs and Configuration
+#############################################################################
+
+# Keep log files (but not in outputs directory)
+!*.log
+!logs/
+!outputs/logs/
+
+# Keep configuration files
+!configs/
+!*.yaml
+!*.yml
+!*.json
+!requirements.txt
+!*.toml
+
+#############################################################################
+# Python
+#############################################################################
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+venv_*/
+FastReg/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+#############################################################################
+# Jupyter Notebooks
+#############################################################################
+
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.ipynb
+
+# IPython
+profile_default/
+ipython_config.py
+
+#############################################################################
+# IDEs and Editors
+#############################################################################
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+#############################################################################
+# Operating System Files
+#############################################################################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+#############################################################################
+# Temporary Files
+#############################################################################
+
+# Temporary directories
+tmp/
+temp/
+temporary/
+cache/
+.cache/
+
+# Log files in root (but keep structured logs)
+*.out
+*.err
+nohup.out
+training_*.log
+inference.log
+download.log
+
+# SLURM output files
+slurm-*.out
+slurm-*.err
+training_*.out
+training_*.err
+inference_*.out
+inference_*.err
+
+# Process ID files
+*.pid
+
+#############################################################################
+# Project Specific
+#############################################################################
+
+# Downloaded data
+fastmri_*.tar.xz
+knee_*.tar.xz
+brain_*.tar.xz
+*.tar.gz
+
+# Extracted archives
+multicoil_*/
+singlecoil_*/
+
+# Wandb logs
+wandb/
+
+# Tensorboard logs (too large)
+runs/
+tb_logs/
+
+# Backup files
+*.bak
+*.backup
+*_backup*
+*_old*
+
+# Profile files
+*.prof
+profiling/
+
+#############################################################################
+# Keep Important Files (Override above excludes)
+#############################################################################
+
+# Always keep these important files
+!README.md
+!LICENSE
+!setup.py
+!pyproject.toml
+!requirements.txt
+!environment.yml
+!.github/
+!docs/
+!tests/
+!src/
+!scripts/
+!configs/
+
+# Keep specific small example files
+!examples/
+!sample_data/small_*.h5
+
+# Keep documentation figures (small ones)
+!docs/figures/
+!README_figures/
+
+#############################################################################
+# Development Files to Keep
+#############################################################################
+
+# Keep test results but not large test outputs
+!test_results.txt
+!coverage_report.txt
+
+# Keep small configuration examples
+!example_config.yaml
+!default_config.yaml
+
+# Keep shell scripts
+!*.sh
+!*.bash
