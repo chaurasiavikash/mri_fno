@@ -4,6 +4,7 @@ import os
 import h5py
 import torch
 import numpy as np
+import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from typing import Dict, List, Optional, Tuple, Callable
 import logging
@@ -149,9 +150,33 @@ class FastMRIDataset(Dataset):
     #         # Return a dummy sample in case of error
     #         return self._get_dummy_sample()
     
+    def _pad_to_common_size(self, tensor: torch.Tensor) -> torch.Tensor:
+        """
+        Pad tensor to common FastMRI size.
+        Most FastMRI images are 640x368, but some vary slightly.
+        """
+        # Target size - slightly larger to accommodate all variations
+        target_h, target_w = 640, 372  # Use the larger width we've seen
+        
+        # Get current size
+        *batch_dims, h, w = tensor.shape
+        
+        # Pad height if needed
+        if h < target_h:
+            pad_h = target_h - h
+            tensor = F.pad(tensor, (0, 0, 0, pad_h))
+        
+        # Pad width if needed  
+        if w < target_w:
+            pad_w = target_w - w
+            tensor = F.pad(tensor, (0, pad_w, 0, 0))
+        
+        return tensor
+
+
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         metadata = self.file_metadata[idx]
-        
+        target_size = (640, 368)  # (height, width)
         try:
             with h5py.File(metadata['file_path'], 'r') as f:
                 # Load k-space data for specific slice
@@ -172,9 +197,13 @@ class FastMRIDataset(Dataset):
                 # Apply mask to k-space
                 kspace_masked = apply_mask(kspace_full, mask)
                 
+                kspace_full = self._pad_to_common_size(kspace_full)
+                kspace_masked = self._pad_to_common_size(kspace_masked)
+
                 # Reconstruct images
                 image_full = self._reconstruct_image(kspace_full)
                 image_masked = self._reconstruct_image(kspace_masked)
+          
                 
                 # Prepare sample
                 sample = {

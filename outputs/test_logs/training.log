@@ -105,3 +105,39 @@ Original Traceback (most recent call last):
 RuntimeError: stack expects each tensor to be equal size, but got [15, 2, 640, 368] at entry 0 and [15, 2, 640, 372] at entry 1
 
 2025-07-24 23:39:31,719 - MRITrainer - INFO - Checkpoint saved: checkpoint_error.pth
+2025-07-25 00:01:32,385 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-25 00:01:32,397 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmpg6kdzyug.yaml
+2025-07-25 00:01:32,402 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 00:02:21,853 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 00:02:21,857 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 00:03:14,280 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 00:03:14,282 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 00:03:49,996 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 00:03:49,998 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 00:04:18,348 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-25 00:04:18,348 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-25 00:04:22,356 - train - ERROR - Training failed with error: Caught RuntimeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/fetch.py", line 55, in fetch
+    return self.collate_fn(data)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 398, in default_collate
+    return collate(batch, collate_fn_map=default_collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 171, in collate
+    {
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 172, in <dictcomp>
+    key: collate(
+         ^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 155, in collate
+    return collate_fn_map[elem_type](batch, collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vchaurasia/miniconda3/envs/FastReg/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 272, in collate_tensor_fn
+    return torch.stack(batch, 0, out=out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: stack expects each tensor to be equal size, but got [640, 368] at entry 0 and [640, 372] at entry 1
+
+2025-07-25 00:04:23,319 - MRITrainer - INFO - Checkpoint saved: checkpoint_error.pth
