@@ -197,3 +197,35 @@ RuntimeError: stack expects each tensor to be equal size, but got [640, 368] at 
 2025-07-25 15:45:30,059 - MRITrainer - INFO - Epoch 19: Train Loss: 0.8985, Val Loss: 0.8927932657100962, Time: 2223.03s
 2025-07-25 16:22:28,966 - MRITrainer - INFO - Epoch 20: Train Loss: 0.9019, Val Loss: 0.8766661836377307, Time: 2218.89s
 2025-07-25 16:22:31,345 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_20.pth
+2025-07-25 21:40:00,781 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-25 21:40:00,819 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmpw0a8bte6.yaml
+2025-07-25 21:40:00,821 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 21:40:01,079 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 21:40:23,264 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 21:40:23,267 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 21:40:23,385 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 21:40:42,336 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 21:40:42,339 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 21:40:42,527 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 21:40:54,558 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 21:40:54,559 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 21:41:12,760 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-25 21:41:12,761 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-25 21:49:03,663 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-25 21:49:03,668 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmpq_i0hklg.yaml
+2025-07-25 21:49:03,670 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 21:49:03,672 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 21:49:03,955 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 21:49:03,957 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 21:49:04,048 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 21:49:20,876 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 21:49:20,877 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 21:49:20,954 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 21:49:32,015 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 21:49:32,016 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 21:49:49,091 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-25 21:49:50,935 - MRITrainer - INFO - Checkpoint loaded: /scratch/vchaurasia/mri_models/disco/models/checkpoint_epoch_20.pth (epoch 20)
+2025-07-25 21:49:50,936 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-25 22:28:13,092 - MRITrainer - INFO - Epoch 20: Train Loss: 0.8839, Val Loss: 0.9016763280509165, Time: 2302.16s
+2025-07-25 22:28:14,040 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_20.pth
+2025-07-25 23:02:54,511 - MRITrainer - INFO - Epoch 21: Train Loss: 0.8826, Val Loss: 0.877728205416435, Time: 2080.47s

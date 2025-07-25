@@ -1,0 +1,11 @@
+2025-07-25 18:15:46,219 - infer - INFO - Starting MRI reconstruction inference on cuda
+2025-07-25 18:15:46,221 - infer - INFO - Model: outputs/test_models/best_model.pth
+2025-07-25 18:15:46,221 - infer - INFO - Output directory: outputs/minimal_disco_test
+2025-07-25 18:15:47,835 - MRIInferenceEngine - INFO - Model loaded from outputs/test_models/best_model.pth
+2025-07-25 18:15:47,835 - MRIInferenceEngine - INFO - Model trained for 13 epochs, best validation loss: 0.8668452089176317
+2025-07-25 18:15:47,836 - FastMRIDataset - INFO - Found 2 files in data/minimal_test
+2025-07-25 18:15:47,839 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 18:15:47,842 - FastMRIDataset - INFO - Total slices: 68
+2025-07-25 18:15:47,842 - MRIInferenceEngine - INFO - Test dataset loaded: 68 samples
+2025-07-25 18:15:47,843 - MRIInferenceEngine - INFO - Inference engine initialized
+2025-07-25 18:15:47,843 - MRIInferenceEngine - INFO - Starting inference...

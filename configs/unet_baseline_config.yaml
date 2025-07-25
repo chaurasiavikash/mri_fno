@@ -73,6 +73,6 @@ system:
 logging:
   use_wandb: false
   project_name: "unet_baseline"
-  log_dir: "/home/vchaurasia/projects/mri_fno/outputs/unet_logs"
-  save_model_dir: "/home/vchaurasia/projects/mri_fno/outputs/unet_models"
-  results_dir: "/home/vchaurasia/projects/mri_fno/outputs/unet_results"
+  log_dir: "/scratch/vchaurasia/mri_models/unet/logs"
+  save_model_dir: "/scratch/vchaurasia/mri_models/unet/models"
+  results_dir: "/scratch/vchaurasia/mri_models/unet/results"

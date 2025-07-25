@@ -1,0 +1,11 @@
+2025-07-25 23:16:57,562 - infer - INFO - Starting MRI reconstruction inference on cuda
+2025-07-25 23:16:57,562 - infer - INFO - Model: /scratch/vchaurasia/mri_models/disco/models/best_model.pth
+2025-07-25 23:16:57,563 - infer - INFO - Output directory: outputs/single_test
+2025-07-25 23:16:58,546 - MRIInferenceEngine - INFO - Model loaded from /scratch/vchaurasia/mri_models/disco/models/best_model.pth
+2025-07-25 23:16:58,546 - MRIInferenceEngine - INFO - Model trained for 13 epochs, best validation loss: 0.8668452089176317
+2025-07-25 23:16:58,547 - FastMRIDataset - INFO - Found 1 files in data/single_test
+2025-07-25 23:16:58,549 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 23:16:58,551 - FastMRIDataset - INFO - Total slices: 38
+2025-07-25 23:16:58,551 - MRIInferenceEngine - INFO - Test dataset loaded: 38 samples
+2025-07-25 23:16:58,552 - MRIInferenceEngine - INFO - Inference engine initialized
+2025-07-25 23:16:58,552 - MRIInferenceEngine - INFO - Starting inference...

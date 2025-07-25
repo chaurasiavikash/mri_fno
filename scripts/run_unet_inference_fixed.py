@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-U-Net specific inference script.
+Fixed U-Net specific inference script.
 """
 
 import os
@@ -92,25 +92,17 @@ def main():
     # Create U-Net config
     unet_config = {
         'in_channels': 2,
-        'out_channels': 1,
-        'features': 64,  # Base features
+        'out_channels': 2,  # Fixed: should be 2 based on debug output
+        'features': 64,
         'bilinear': False
     }
-    
-    # Try to get config from checkpoint if available
-    if 'config' in checkpoint and 'model' in checkpoint['config']:
-        stored_config = checkpoint['config']['model']
-        # Update with stored values if they exist
-        for key in ['in_channels', 'out_channels', 'features']:
-            if key in stored_config:
-                unet_config[key] = stored_config[key]
     
     logger.info(f"Using U-Net config: {unet_config}")
     
     # Create model
     model = MRIUNetModel(
         unet_config=unet_config,
-        use_data_consistency=False,  # U-Net typically doesn't use DC
+        use_data_consistency=False,
         dc_weight=0.0
     ).to(device)
     
@@ -152,6 +144,7 @@ def main():
         
         # Prepare U-Net input
         kspace_masked = sample['kspace_masked']
+        mask = sample['mask']
         target = sample['target']
         
         # Convert to image domain
@@ -164,10 +157,14 @@ def main():
         phase = torch.angle(combined_image).unsqueeze(0).unsqueeze(0)
         unet_input = torch.cat([magnitude, phase], dim=1).to(device)
         
+        # Prepare mask
+        unet_mask = mask.unsqueeze(0).to(device)
+        
         # Forward pass
         with torch.no_grad():
-            output = model(unet_input)
-            reconstruction = output.squeeze().cpu()
+            output_dict = model(unet_input, unet_mask)
+            # Extract the main reconstruction from the dictionary
+            reconstruction = output_dict['output'].squeeze().cpu()
         
         inference_time = time.time() - start_time
         
@@ -193,11 +190,21 @@ def main():
             f"Target {i}"
         )
         
+        # Save zero-filled for comparison
+        zero_filled = torch.abs(combined_image).cpu()
+        save_tensor_as_image(
+            zero_filled,
+            results_dir / f"zero_filled_{i:04d}.png",
+            f"Zero-filled {i}"
+        )
+        
         # Save metrics
         metrics_file = metrics_dir / f"metrics_{i:04d}.txt"
         with open(metrics_file, 'w') as f:
             for metric_name, metric_value in metrics.items():
                 f.write(f"{metric_name.upper()}: {metric_value:.6f}\n")
+        
+        logger.info(f"Sample {i}: PSNR={metrics['psnr']:.2f}, SSIM={metrics['ssim']:.4f}, Time={metrics['inference_time']:.3f}s")
     
     # Save summary
     summary_file = Path(args.output) / "summary_metrics.txt"

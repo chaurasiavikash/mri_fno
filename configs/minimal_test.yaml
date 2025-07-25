@@ -1,0 +1,37 @@
+data:
+  train_path: "/scratch/vchaurasia/fastmri_data/train"
+  val_path: "/scratch/vchaurasia/fastmri_data/val"  
+  test_path: "data/minimal_test"  # Only 1-2 files
+  acceleration: 4
+  center_fraction: 0.08
+  num_workers: 0
+  batch_size: 1
+  mask_type: "random"
+
+model:
+  name: "disco_neural_operator"
+  in_channels: 2
+  out_channels: 2
+  hidden_channels: 64
+  num_layers: 4
+  modes: 12
+  width: 64
+  dropout: 0.1
+  use_residual: true
+  activation: "gelu"
+
+loss:
+  type: "combined"
+  l1_weight: 1.0
+  ssim_weight: 0.1
+  perceptual_weight: 0.01
+  data_consistency_weight: 1.0
+
+system:
+  device: "cuda"
+  seed: 42
+  log_level: "INFO"
+
+evaluation:
+  metrics: ["psnr", "ssim", "nmse"]
+  save_images: true
