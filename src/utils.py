@@ -85,19 +85,26 @@ def get_device(device: str = "auto") -> torch.device:
         return torch.device(device)
 
 
-def complex_to_real(tensor: torch.Tensor) -> torch.Tensor:
+def complex_to_real(x: torch.Tensor) -> torch.Tensor:
     """
     Convert complex tensor to real tensor with separate real/imaginary channels.
     
     Args:
-        tensor: Complex tensor of shape (..., H, W)
+        x: Complex tensor of shape (..., H, W)
         
     Returns:
-        Real tensor of shape (..., 2, H, W) where dim -3 has real/imaginary parts
+        Real tensor of shape (..., 2, H, W) where channel 0 is real, channel 1 is imaginary
     """
-    if not torch.is_complex(tensor):
-        raise ValueError("Input tensor must be complex")
-    return torch.stack([torch.real(tensor), torch.imag(tensor)], dim=-3)
+    if not torch.is_complex(x):
+        raise ValueError(f"Input tensor must be complex, got {x.dtype}")
+    
+    # Stack real and imaginary parts along new dimension
+    real_part = torch.real(x)
+    imag_part = torch.imag(x)
+    
+    # Insert the channel dimension at the second-to-last position
+    # For shape (..., H, W) -> (..., 2, H, W)
+    return torch.stack([real_part, imag_part], dim=-3)
 
 
 def real_to_complex(x: torch.Tensor) -> torch.Tensor:
@@ -111,8 +118,13 @@ def real_to_complex(x: torch.Tensor) -> torch.Tensor:
         Complex tensor of shape (..., H, W)
     """
     if x.shape[-3] != 2:
-        raise ValueError(f"Expected tensor with 2 channels in the -3 dimension, got shape {x.shape}")
-    return torch.complex(x[..., 0, :, :], x[..., 1, :, :])
+        raise ValueError(f"Expected 2 channels for real/imaginary, got shape {x.shape}")
+    
+    real_part = x[..., 0, :, :]
+    imag_part = x[..., 1, :, :]
+    
+    return torch.complex(real_part, imag_part)
+
 
 def fft2c(x: torch.Tensor) -> torch.Tensor:
     """
@@ -151,10 +163,17 @@ def apply_mask(kspace: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     Returns:
         Masked k-space data
     """
+    # Ensure mask has the same number of dimensions as kspace
+    while mask.dim() < kspace.dim():
+        mask = mask.unsqueeze(0)
+    
+    # Broadcast mask to match kspace shape
+    mask = mask.expand_as(kspace)
+    
     return kspace * mask
 
 
-def root_sum_of_squares(x: torch.Tensor, dim: int = 1) -> torch.Tensor:
+def root_sum_of_squares(x: torch.Tensor, dim: int = 0) -> torch.Tensor:
     """
     Compute root sum of squares along specified dimension.
     
@@ -165,7 +184,7 @@ def root_sum_of_squares(x: torch.Tensor, dim: int = 1) -> torch.Tensor:
     Returns:
         RSS tensor
     """
-    return torch.sqrt(torch.sum(torch.abs(x) ** 2, dim=dim, keepdim=True))
+    return torch.sqrt(torch.sum(torch.abs(x) ** 2, dim=dim, keepdim=False))
 
 
 def normalize_tensor(x: torch.Tensor, eps: float = 1e-8) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -252,17 +271,3 @@ def count_parameters(model: torch.nn.Module) -> int:
         Number of trainable parameters
     """
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-def to_complex64(x: torch.Tensor) -> torch.Tensor:
-    """
-    Convert tensor to complex64 dtype if it is complex.
-    
-    Args:
-        x: Input tensor
-
-    Returns:
-        Tensor converted to complex64 dtype
-    """
-    if torch.is_complex(x):
-        return x.to(torch.complex64)
-    return x

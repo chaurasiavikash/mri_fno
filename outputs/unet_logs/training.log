@@ -1,0 +1,12 @@
+2025-07-25 14:25:12,217 - __main__ - INFO - Starting U-Net baseline training on cuda
+2025-07-25 14:25:12,268 - __main__ - INFO - Configuration: configs/unet_baseline_config.yaml
+2025-07-25 14:25:12,270 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 14:25:12,273 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:25:14,066 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 14:25:14,068 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 14:25:14,070 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 14:25:29,037 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 14:25:29,039 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 14:25:29,225 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:25:41,337 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 14:25:41,379 - UNetTrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046

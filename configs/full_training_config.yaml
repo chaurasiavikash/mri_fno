@@ -5,7 +5,7 @@ data:
   test_path: "/scratch/vchaurasia/fastmri_data/test"
   acceleration: 4
   center_fraction: 0.08
-  num_workers: 8        # More workers for cluster
+  num_workers: 4        # More workers for cluster
   batch_size: 2         # Larger batch size
   mask_type: "random"
 

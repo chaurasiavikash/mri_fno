@@ -141,3 +141,54 @@ Original Traceback (most recent call last):
 RuntimeError: stack expects each tensor to be equal size, but got [640, 368] at entry 0 and [640, 372] at entry 1
 
 2025-07-25 00:04:23,319 - MRITrainer - INFO - Checkpoint saved: checkpoint_error.pth
+2025-07-25 00:38:22,489 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-25 00:38:22,503 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmplad8pedu.yaml
+2025-07-25 00:38:22,506 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 00:38:22,508 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 00:38:22,815 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 00:38:22,816 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 00:38:22,818 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 00:38:23,079 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 00:38:23,080 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 00:38:23,082 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 00:38:23,294 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 00:38:23,294 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 00:38:53,319 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-25 00:38:53,319 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-25 01:13:14,912 - train - INFO - Starting MRI reconstruction training on cuda
+2025-07-25 01:13:14,913 - train - INFO - Configuration: /home/vchaurasia/apps/vscode-complete-portable/tmp/tmpz8p350qi.yaml
+2025-07-25 01:13:14,915 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 01:13:15,210 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 01:13:59,166 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 01:13:59,169 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 01:13:59,197 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 01:14:29,321 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 01:14:29,323 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 01:14:29,458 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 01:14:56,765 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 01:14:56,766 - MRITrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 01:15:16,322 - MRITrainer - INFO - Trainer initialized with 17372994 parameters
+2025-07-25 01:15:16,323 - MRITrainer - INFO - Starting training for 100 epochs
+2025-07-25 02:10:32,746 - MRITrainer - INFO - Epoch 0: Train Loss: 25.7549, Val Loss: 1.0873585561699664, Time: 3316.42s
+2025-07-25 02:10:35,127 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_0.pth
+2025-07-25 02:10:39,560 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_0.pth
+2025-07-25 03:04:04,800 - MRITrainer - INFO - Epoch 1: Train Loss: 1.0115, Val Loss: 0.8738527786354179, Time: 3205.24s
+2025-07-25 03:04:08,365 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_1.pth
+2025-07-25 03:56:34,975 - MRITrainer - INFO - Epoch 2: Train Loss: 0.9302, Val Loss: 0.9147661699090704, Time: 3146.61s
+2025-07-25 04:48:47,066 - MRITrainer - INFO - Epoch 3: Train Loss: 0.9301, Val Loss: 0.8777494208026895, Time: 3132.06s
+2025-07-25 05:42:28,876 - MRITrainer - INFO - Epoch 4: Train Loss: 0.9132, Val Loss: 0.8930323472488755, Time: 3221.78s
+2025-07-25 06:30:07,972 - MRITrainer - INFO - Epoch 5: Train Loss: 0.9472, Val Loss: 1.0799370376150972, Time: 2859.07s
+2025-07-25 07:18:23,279 - MRITrainer - INFO - Epoch 6: Train Loss: 0.9266, Val Loss: 0.9087694745694576, Time: 2895.28s
+2025-07-25 08:07:43,721 - MRITrainer - INFO - Epoch 7: Train Loss: 0.8983, Val Loss: 0.8764106693506375, Time: 2960.40s
+2025-07-25 08:59:27,934 - MRITrainer - INFO - Epoch 8: Train Loss: 0.9032, Val Loss: 0.868233283221588, Time: 3104.18s
+2025-07-25 08:59:32,913 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_8.pth
+2025-07-25 09:49:01,125 - MRITrainer - INFO - Epoch 9: Train Loss: 0.9025, Val Loss: 0.874244674864839, Time: 2968.21s
+2025-07-25 10:35:42,908 - MRITrainer - INFO - Epoch 10: Train Loss: 0.9007, Val Loss: 0.9186061701399061, Time: 2801.74s
+2025-07-25 10:35:43,448 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_10.pth
+2025-07-25 11:17:28,904 - MRITrainer - INFO - Epoch 11: Train Loss: 0.9013, Val Loss: 0.9181953494357689, Time: 2505.45s
+2025-07-25 11:51:14,914 - MRITrainer - INFO - Epoch 12: Train Loss: 0.9079, Val Loss: 0.9202322779315202, Time: 2025.99s
+2025-07-25 12:22:25,195 - MRITrainer - INFO - Epoch 13: Train Loss: 0.8998, Val Loss: 0.8668452089176317, Time: 1870.25s
+2025-07-25 12:22:28,000 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_13.pth
+2025-07-25 12:55:08,894 - MRITrainer - INFO - Epoch 14: Train Loss: 0.9038, Val Loss: 0.9376892823842876, Time: 1960.89s
+2025-07-25 13:27:41,016 - MRITrainer - INFO - Epoch 15: Train Loss: 0.9304, Val Loss: 0.8729139871878608, Time: 1952.09s
+2025-07-25 14:02:03,028 - MRITrainer - INFO - Epoch 16: Train Loss: 0.8926, Val Loss: 1.0128020076540554, Time: 2062.00s
