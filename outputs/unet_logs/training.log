@@ -10,3 +10,52 @@
 2025-07-25 14:25:29,225 - FastMRIDataset - INFO - Using target size: (640, 368)
 2025-07-25 14:25:41,337 - FastMRIDataset - INFO - Total slices: 4092
 2025-07-25 14:25:41,379 - UNetTrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 14:35:29,152 - __main__ - INFO - Starting U-Net baseline training on cuda
+2025-07-25 14:35:29,169 - __main__ - INFO - Configuration: configs/unet_baseline_config.yaml
+2025-07-25 14:35:29,171 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 14:35:29,208 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:35:42,096 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 14:35:42,098 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 14:35:42,152 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 14:35:47,323 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 14:35:47,326 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 14:35:47,592 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:35:52,942 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 14:35:53,002 - UNetTrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 14:40:44,288 - __main__ - INFO - Starting U-Net baseline training on cuda
+2025-07-25 14:40:44,288 - __main__ - INFO - Configuration: configs/unet_baseline_config.yaml
+2025-07-25 14:40:44,290 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 14:40:44,292 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:40:44,577 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 14:40:44,579 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 14:40:44,581 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 14:40:45,934 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 14:40:45,935 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 14:40:45,938 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:40:46,415 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 14:40:46,461 - UNetTrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 14:41:04,025 - UNetTrainer - INFO - Trainer initialized with 17262466 parameters
+2025-07-25 14:41:04,025 - UNetTrainer - INFO - Starting training for 1 epochs
+2025-07-25 14:42:25,488 - __main__ - INFO - Training interrupted by user
+2025-07-25 14:42:26,004 - UNetTrainer - INFO - Checkpoint saved: unet_checkpoint_interrupted.pth
+2025-07-25 14:42:48,303 - __main__ - INFO - Starting U-Net baseline training on cuda
+2025-07-25 14:42:48,303 - __main__ - INFO - Configuration: configs/unet_baseline_config.yaml
+2025-07-25 14:42:48,305 - FastMRIDataset - INFO - Found 197 files in /scratch/vchaurasia/fastmri_data/train
+2025-07-25 14:42:48,307 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:42:48,590 - FastMRIDataset - INFO - Total slices: 7049
+2025-07-25 14:42:48,591 - FastMRIDataset - INFO - Found 199 files in /scratch/vchaurasia/fastmri_data/val
+2025-07-25 14:42:48,593 - FastMRIDataset - INFO - Using target size: (640, 372)
+2025-07-25 14:42:49,037 - FastMRIDataset - INFO - Total slices: 7135
+2025-07-25 14:42:49,039 - FastMRIDataset - INFO - Found 118 files in /scratch/vchaurasia/fastmri_data/test
+2025-07-25 14:42:49,040 - FastMRIDataset - INFO - Using target size: (640, 368)
+2025-07-25 14:42:49,414 - FastMRIDataset - INFO - Total slices: 4092
+2025-07-25 14:42:49,458 - UNetTrainer - INFO - Data loaders created: Train: 3524, Val: 3568, Test: 2046
+2025-07-25 14:42:51,601 - UNetTrainer - INFO - Trainer initialized with 17262466 parameters
+2025-07-25 14:42:51,602 - UNetTrainer - INFO - Starting training for 30 epochs
+2025-07-25 15:03:00,249 - UNetTrainer - INFO - Epoch 0: Train Loss: 1.1035, Val Loss: 0.9872829685396945, Time: 1208.65s
+2025-07-25 15:03:00,812 - UNetTrainer - INFO - Checkpoint saved: checkpoint_epoch_0.pth
+2025-07-25 15:03:02,368 - UNetTrainer - INFO - Checkpoint saved: checkpoint_epoch_0.pth
+2025-07-25 15:29:27,449 - UNetTrainer - INFO - Epoch 1: Train Loss: 1.4420, Val Loss: 1.2253087392836943, Time: 1585.08s
+2025-07-25 16:01:27,643 - UNetTrainer - INFO - Epoch 2: Train Loss: 1.2882, Val Loss: 1.6441791780593684, Time: 1920.18s
+2025-07-25 16:22:28,435 - UNetTrainer - INFO - Epoch 3: Train Loss: 1.3563, Val Loss: 1.8551192653820654, Time: 1260.78s
+2025-07-25 16:49:55,281 - UNetTrainer - INFO - Epoch 4: Train Loss: 1.0699, Val Loss: 1.0567328150263013, Time: 1646.82s

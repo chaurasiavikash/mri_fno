@@ -192,3 +192,8 @@ RuntimeError: stack expects each tensor to be equal size, but got [640, 368] at 
 2025-07-25 12:55:08,894 - MRITrainer - INFO - Epoch 14: Train Loss: 0.9038, Val Loss: 0.9376892823842876, Time: 1960.89s
 2025-07-25 13:27:41,016 - MRITrainer - INFO - Epoch 15: Train Loss: 0.9304, Val Loss: 0.8729139871878608, Time: 1952.09s
 2025-07-25 14:02:03,028 - MRITrainer - INFO - Epoch 16: Train Loss: 0.8926, Val Loss: 1.0128020076540554, Time: 2062.00s
+2025-07-25 14:35:54,642 - MRITrainer - INFO - Epoch 17: Train Loss: 0.9072, Val Loss: 0.9756165713806858, Time: 2031.61s
+2025-07-25 15:08:27,001 - MRITrainer - INFO - Epoch 18: Train Loss: 0.9119, Val Loss: 0.8830665069310655, Time: 1952.35s
+2025-07-25 15:45:30,059 - MRITrainer - INFO - Epoch 19: Train Loss: 0.8985, Val Loss: 0.8927932657100962, Time: 2223.03s
+2025-07-25 16:22:28,966 - MRITrainer - INFO - Epoch 20: Train Loss: 0.9019, Val Loss: 0.8766661836377307, Time: 2218.89s
+2025-07-25 16:22:31,345 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_20.pth
