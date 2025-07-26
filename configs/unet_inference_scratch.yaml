@@ -1,0 +1,45 @@
+data:
+  acceleration: 4
+  batch_size: 1
+  center_fraction: 0.08
+  mask_type: random
+  num_workers: 4
+  test_path: /scratch/vchaurasia/fastmri_data/test
+  train_path: /scratch/vchaurasia/fastmri_data/train
+  val_path: /scratch/vchaurasia/fastmri_data/val
+evaluation:
+  metrics:
+  - psnr
+  - ssim
+  - nmse
+  - mae
+  - nrmse
+  num_test_images: 10
+  save_images: true
+  save_raw_data: true
+logging:
+  log_dir: /scratch/vchaurasia/organized_models/inference_logs
+  project_name: unet_inference
+  results_dir: /scratch/vchaurasia/organized_models/inference_results
+  save_model_dir: /scratch/vchaurasia/organized_models
+  use_wandb: false
+loss:
+  data_consistency_weight: 0.5
+  l1_weight: 1.0
+  perceptual_weight: 0.0
+  ssim_weight: 0.1
+  type: combined
+model:
+  activation: relu
+  depth: 4
+  dropout: 0.1
+  features: 64
+  in_channels: 2
+  name: unet_cnn
+  out_channels: 2
+  use_residual: false
+system:
+  device: cuda
+  log_level: INFO
+  num_threads: 8
+  seed: 42
