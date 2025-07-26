@@ -96,7 +96,7 @@ def create_undersampling_mask(shape, acceleration=4, center_fraction=0.08, seed=
     
     return mask
 
-def process_single_file(file_path, model, device, max_slices=10):
+def process_single_file(file_path, model, device, max_slices=5):
     """Process a single .h5 file using the EXACT same pipeline as training."""
     results = []
     
@@ -129,6 +129,10 @@ def process_single_file(file_path, model, device, max_slices=10):
             target_image = root_sum_of_squares(image_full, dim=0)
             target_image = torch.abs(target_image)
             
+            mean = target_image.mean()
+            std = target_image.std()
+            target_image = (target_image - mean) / (std + 1e-8)
+            
             # Move to device
             kspace_masked_real = kspace_masked_real.to(device)
             mask_batch = mask.unsqueeze(0).to(device)
@@ -158,7 +162,11 @@ def process_single_file(file_path, model, device, max_slices=10):
                 'reconstruction': reconstruction,
                 'target': target_image
             })
-            
+            # Add this right after the forward pass in your inference script:
+            print(f"Model output range: [{reconstruction.min():.4f}, {reconstruction.max():.4f}]")
+            print(f"Target range: [{target_image.min():.4f}, {target_image.max():.4f}]")
+            print(f"Model output shape: {reconstruction.shape}")
+            print(f"Target shape: {target_image.shape}")
             print(f"  Slice {slice_idx}: PSNR={metrics['psnr']:.2f}, SSIM={metrics['ssim']:.4f}")
     
     return results
@@ -223,8 +231,8 @@ def main():
     
     model.eval()
     
-    # Get test files
-    test_files = list(Path(test_data_path).glob("*.h5"))[:10]  # Process 10 files
+    # Get test files - CHANGED: Process 100 files like DISCO
+    test_files = list(Path(test_data_path).glob("*.h5"))[:100]  # Process 100 files
     print(f"Processing {len(test_files)} files...")
     
     # Process files

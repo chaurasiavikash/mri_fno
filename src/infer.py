@@ -123,26 +123,29 @@ class MRIInferenceEngine:
         """Setup data loader for inference."""
         data_config = self.config['data']
         
-        # Create test dataset
+        # Create test dataset - FIXED: Use same normalization as training
         self.test_dataset = FastMRIDataset(
             data_path=data_config['test_path'],
             acceleration=data_config['acceleration'],
             center_fraction=data_config['center_fraction'],
-            transform=None,  # No normalization for inference
+            transform=None,  # We'll handle normalization manually for proper target scaling
             use_seed=True,
             seed=self.config['system']['seed']
         )
         
-        # Create data loader
+        # Create data loader - OPTIMIZED: Increase batch size for faster processing
+        batch_size = min(4, data_config.get('batch_size', 1))  # Use up to 4 for speed
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
-            batch_size=1,  # Process one sample at a time for inference
+            batch_size=batch_size,
             shuffle=False,
-            num_workers=data_config.get('num_workers', 0),
-            pin_memory=torch.cuda.is_available()
+            num_workers=min(4, data_config.get('num_workers', 0)),  # More workers
+            pin_memory=torch.cuda.is_available(),
+            persistent_workers=True if data_config.get('num_workers', 0) > 0 else False
         )
         
         self.logger.info(f"Test dataset loaded: {len(self.test_dataset)} samples")
+        self.logger.info(f"Using batch size: {batch_size} for faster processing")
     
     def infer_single_sample(
         self,
@@ -221,7 +224,10 @@ class MRIInferenceEngine:
         mse = np.mean((pred_np - target_np) ** 2)
         if mse > 0:
             max_val = np.max(target_np)
-            metrics['psnr'] = 20 * np.log10(max_val / np.sqrt(mse))
+            if max_val > 0:
+                metrics['psnr'] = 20 * np.log10(max_val / np.sqrt(mse))
+            else:
+                metrics['psnr'] = float('-inf')
         else:
             metrics['psnr'] = float('inf')
         
@@ -229,13 +235,21 @@ class MRIInferenceEngine:
         metrics['ssim'] = self._compute_ssim(pred_np, target_np)
         
         # Normalized Mean Squared Error (NMSE)
-        metrics['nmse'] = mse / np.mean(target_np ** 2)
+        target_power = np.mean(target_np ** 2)
+        if target_power > 0:
+            metrics['nmse'] = mse / target_power
+        else:
+            metrics['nmse'] = float('inf')
         
         # Mean Absolute Error (MAE)
         metrics['mae'] = np.mean(np.abs(pred_np - target_np))
         
         # Normalized Root Mean Squared Error (NRMSE)
-        metrics['nrmse'] = np.sqrt(mse) / np.mean(target_np)
+        target_mean = np.mean(target_np)
+        if target_mean > 0:
+            metrics['nrmse'] = np.sqrt(mse) / target_mean
+        else:
+            metrics['nrmse'] = float('inf')
         
         return metrics
     
@@ -259,6 +273,9 @@ class MRIInferenceEngine:
         if data_range is None:
             data_range = np.max(target) - np.min(target)
         
+        if data_range == 0:
+            return float('-inf')
+        
         # Constants for SSIM
         c1 = (0.01 * data_range) ** 2
         c2 = (0.03 * data_range) ** 2
@@ -275,6 +292,9 @@ class MRIInferenceEngine:
         # Compute SSIM
         numerator = (2 * mu1 * mu2 + c1) * (2 * sigma12 + c2)
         denominator = (mu1 ** 2 + mu2 ** 2 + c1) * (sigma1_sq + sigma2_sq + c2)
+        
+        if denominator == 0:
+            return float('-inf')
         
         ssim = numerator / denominator
         
@@ -366,44 +386,66 @@ class MRIInferenceEngine:
         
         pbar = tqdm(enumerate(self.test_loader), total=num_samples, desc="Inference")
         
-        for sample_idx, batch in pbar:
-            if max_samples and sample_idx >= max_samples:
+        sample_count = 0
+        
+        for batch_idx, batch in pbar:
+            if max_samples and sample_count >= max_samples:
                 break
             
             # Extract data
             kspace_masked = batch['kspace_masked']
             mask = batch['mask']
-            target = batch['target']
+            target_raw = batch['target']
             kspace_full = batch.get('kspace_full')
             metadata = batch['metadata']
             
-            # Run inference
-            results = self.infer_single_sample(kspace_masked, mask, kspace_full)
+            batch_size = kspace_masked.shape[0]
             
-            # Compute metrics
-            metrics = self.compute_metrics(results['reconstruction'], target)
-            metrics['inference_time'] = results['inference_time']
-            
-            # Collect metrics
-            for metric_name, metric_value in metrics.items():
-                if metric_name in all_metrics:
-                    all_metrics[metric_name].append(metric_value)
-            
-            # Save results
-            if save_all:
-                # Convert metadata from batch format
-                sample_metadata = {
-                    k: v[0] if isinstance(v, (list, torch.Tensor)) else v
-                    for k, v in metadata.items()
-                }
-                self.save_results(results, metrics, sample_idx, sample_metadata)
-            
-            # Update progress bar
-            pbar.set_postfix({
-                'PSNR': f"{metrics['psnr']:.2f}",
-                'SSIM': f"{metrics['ssim']:.4f}",
-                'Time': f"{metrics['inference_time']:.3f}s"
-            })
+            # Process each sample in the batch
+            for i in range(batch_size):
+                if max_samples and sample_count >= max_samples:
+                    break
+                
+                # Extract single sample
+                single_kspace_masked = kspace_masked[i:i+1]
+                single_mask = mask[i] if mask.dim() > 2 else mask
+                single_target_raw = target_raw[i]
+                single_kspace_full = kspace_full[i:i+1] if kspace_full is not None else None
+                
+                # FIXED: Apply normalization to target (same as training)
+                target_mean = single_target_raw.mean()
+                target_std = single_target_raw.std()
+                single_target = (single_target_raw - target_mean) / (target_std + 1e-8)
+                
+                # Run inference
+                results = self.infer_single_sample(single_kspace_masked, single_mask, single_kspace_full)
+                
+                # Compute metrics
+                metrics = self.compute_metrics(results['reconstruction'], single_target)
+                metrics['inference_time'] = results['inference_time']
+                
+                # Collect metrics
+                for metric_name, metric_value in metrics.items():
+                    if metric_name in all_metrics:
+                        all_metrics[metric_name].append(metric_value)
+                
+                # Save results
+                if save_all:
+                    # Convert metadata from batch format
+                    sample_metadata = {
+                        k: v[i] if isinstance(v, (list, torch.Tensor)) and len(v) > i else v
+                        for k, v in metadata.items()
+                    }
+                    self.save_results(results, metrics, sample_count, sample_metadata)
+                
+                sample_count += 1
+                
+                # Update progress bar
+                pbar.set_postfix({
+                    'PSNR': f"{metrics['psnr']:.2f}",
+                    'SSIM': f"{metrics['ssim']:.4f}",
+                    'Time': f"{metrics['inference_time']:.3f}s"
+                })
         
         # Compute summary statistics
         summary_metrics = {}
@@ -492,10 +534,15 @@ class MRIInferenceEngine:
             # Get sample
             sample = self.test_dataset[idx]
             
+            # Apply normalization to target
+            target_raw = sample['target']
+            target_mean = target_raw.mean()
+            target_std = target_raw.std()
+            target = (target_raw - target_mean) / (target_std + 1e-8)
+            
             # Run inference
             kspace_masked = sample['kspace_masked'].unsqueeze(0)
             mask = sample['mask']
-            target = sample['target']
             
             results = self.infer_single_sample(kspace_masked, mask)
             
