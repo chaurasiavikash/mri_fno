@@ -229,3 +229,28 @@ RuntimeError: stack expects each tensor to be equal size, but got [640, 368] at 
 2025-07-25 22:28:13,092 - MRITrainer - INFO - Epoch 20: Train Loss: 0.8839, Val Loss: 0.9016763280509165, Time: 2302.16s
 2025-07-25 22:28:14,040 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_20.pth
 2025-07-25 23:02:54,511 - MRITrainer - INFO - Epoch 21: Train Loss: 0.8826, Val Loss: 0.877728205416435, Time: 2080.47s
+2025-07-25 23:40:30,633 - MRITrainer - INFO - Epoch 22: Train Loss: 0.8950, Val Loss: 0.8667968850783302, Time: 2256.08s
+2025-07-25 23:40:35,142 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_22.pth
+2025-07-26 00:22:57,490 - MRITrainer - INFO - Epoch 23: Train Loss: 0.8788, Val Loss: 0.8930992935637989, Time: 2542.35s
+2025-07-26 01:07:00,773 - MRITrainer - INFO - Epoch 24: Train Loss: 0.8845, Val Loss: 0.8939064626034867, Time: 2643.26s
+2025-07-26 01:49:14,541 - MRITrainer - INFO - Epoch 25: Train Loss: 0.8988, Val Loss: 0.9267717570049747, Time: 2533.75s
+2025-07-26 02:29:02,792 - MRITrainer - INFO - Epoch 26: Train Loss: 0.8812, Val Loss: 0.8680184067398176, Time: 2388.23s
+2025-07-26 03:09:57,205 - MRITrainer - INFO - Epoch 27: Train Loss: 0.8791, Val Loss: 0.8843157938493608, Time: 2454.39s
+2025-07-26 03:48:18,952 - MRITrainer - INFO - Epoch 28: Train Loss: 0.8906, Val Loss: 0.8648503926486579, Time: 2301.72s
+2025-07-26 03:48:23,704 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_28.pth
+2025-07-26 04:27:06,801 - MRITrainer - INFO - Epoch 29: Train Loss: 0.8848, Val Loss: 0.8627841474463319, Time: 2323.10s
+2025-07-26 04:27:09,675 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_29.pth
+2025-07-26 05:05:49,099 - MRITrainer - INFO - Epoch 30: Train Loss: 0.8851, Val Loss: 0.8625310347102282, Time: 2319.42s
+2025-07-26 05:05:51,849 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_30.pth
+2025-07-26 05:05:55,817 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_30.pth
+2025-07-26 05:44:18,609 - MRITrainer - INFO - Epoch 31: Train Loss: 0.8918, Val Loss: 0.8674929644996008, Time: 2302.79s
+2025-07-26 06:20:27,157 - MRITrainer - INFO - Epoch 32: Train Loss: 0.8739, Val Loss: 0.8629701207621616, Time: 2168.53s
+2025-07-26 06:58:05,273 - MRITrainer - INFO - Epoch 33: Train Loss: 0.8757, Val Loss: 0.8632411050606068, Time: 2258.08s
+2025-07-26 07:34:37,937 - MRITrainer - INFO - Epoch 34: Train Loss: 0.8745, Val Loss: 0.8627471195475402, Time: 2192.64s
+2025-07-26 08:13:07,987 - MRITrainer - INFO - Epoch 35: Train Loss: 0.8740, Val Loss: 0.86552931678235, Time: 2310.01s
+2025-07-26 08:49:51,321 - MRITrainer - INFO - Epoch 36: Train Loss: 0.8809, Val Loss: 0.8789722770034866, Time: 2203.31s
+2025-07-26 09:20:38,695 - MRITrainer - INFO - Epoch 37: Train Loss: 0.8782, Val Loss: 0.8626521196333282, Time: 1847.34s
+2025-07-26 09:54:38,877 - MRITrainer - INFO - Epoch 38: Train Loss: 0.8715, Val Loss: 0.8634701820482988, Time: 2040.15s
+2025-07-26 10:29:48,243 - MRITrainer - INFO - Epoch 39: Train Loss: 0.8735, Val Loss: 0.8860807601412583, Time: 2109.33s
+2025-07-26 11:05:11,985 - MRITrainer - INFO - Epoch 40: Train Loss: 0.8718, Val Loss: 0.877354410581391, Time: 2123.71s
+2025-07-26 11:05:15,669 - MRITrainer - INFO - Checkpoint saved: checkpoint_epoch_40.pth
