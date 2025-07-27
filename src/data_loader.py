@@ -320,7 +320,7 @@ class FastMRIDataset(Dataset):
             Combined image (height, width)
         """
         # Apply inverse FFT to each coil
-        coil_images = ifft2c(kspace)
+        coil_images = ifft2c(kspace * 1e6)
         
         # Combine coils using root sum of squares
         combined_image = root_sum_of_squares(coil_images, dim=0).squeeze()

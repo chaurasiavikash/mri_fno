@@ -23,12 +23,12 @@ def complex_to_real(x):
 def real_to_complex(x):
     """Convert real tensor with real/imag in dim=2 to complex"""
     # For shape (batch, coils, 2, height, width) -> (batch, coils, height, width)
-    print(f"real_to_complex input: {x.shape}")
+    #print(f"real_to_complex input: {x.shape}")
     if x.shape[2] == 2:  # Check if dim=2 has real/imag
         result = torch.complex(x[:, :, 0, :, :], x[:, :, 1, :, :])
     else:
         result = torch.complex(x[..., 0], x[..., 1])  # Fallback for other formats
-    print(f"real_to_complex output: {result.shape}")
+    #print(f"real_to_complex output: {result.shape}")
     return result
 
 
@@ -65,8 +65,8 @@ class Down(nn.Module):
         _, _, h, w = x.shape
         if h >= 2 and w >= 2:
             x = self.maxpool(x)
-        else:
-            print(f"Warning: Skipping maxpool for small tensor {x.shape}")
+        #else:
+            #print(f"Warning: Skipping maxpool for small tensor {x.shape}")
             
         return self.conv(x)
 
@@ -195,17 +195,17 @@ class SimpleMRIUNet(nn.Module):
         
         PROPERLY FIXED: Real/imag to complex conversion preserves all dimensions.
         """
-        print(f"K-space input shape: {kspace_tensor.shape}")
+        #print(f"K-space input shape: {kspace_tensor.shape}")
         
         # Input should be (batch, coils, 2, height, width)
-        print(f"Checking if kspace_tensor.shape[-1] == 2: {kspace_tensor.shape[-1]} == 2 -> {kspace_tensor.shape[-1] == 2}")
-        print(f"Checking if kspace_tensor.shape[2] == 2: {kspace_tensor.shape[2]} == 2 -> {kspace_tensor.shape[2] == 2}")
+        #print(f"Checking if kspace_tensor.shape[-1] == 2: {kspace_tensor.shape[-1]} == 2 -> {kspace_tensor.shape[-1] == 2}")
+        #print(f"Checking if kspace_tensor.shape[2] == 2: {kspace_tensor.shape[2]} == 2 -> {kspace_tensor.shape[2] == 2}")
         
         if kspace_tensor.shape[2] == 2:  # FIXED: Check dimension 2, not last dimension
             # CRITICAL FIX: Use proper indexing - dim=2 is the real/imag dimension
-            print(f"Converting real/imag to complex...")
-            print(f"Real part: {kspace_tensor[:, :, 0, :, :].shape}")
-            print(f"Imag part: {kspace_tensor[:, :, 1, :, :].shape}")
+            #print(f"Converting real/imag to complex...")
+            #print(f"Real part: {kspace_tensor[:, :, 0, :, :].shape}")
+            #print(f"Imag part: {kspace_tensor[:, :, 1, :, :].shape}")
             
             kspace_complex = torch.complex(
                 kspace_tensor[:, :, 0, :, :],  # Real part
@@ -214,7 +214,7 @@ class SimpleMRIUNet(nn.Module):
         else:
             kspace_complex = kspace_tensor
         
-        print(f"K-space complex shape: {kspace_complex.shape}")
+        #print(f"K-space complex shape: {kspace_complex.shape}")
         
         # Verify we didn't lose dimensions
         # Input: (batch, coils, 2, height, width) -> Output: (batch, coils, height, width)
@@ -226,11 +226,11 @@ class SimpleMRIUNet(nn.Module):
         
         # IFFT to image domain: (batch, coils, height, width) -> (batch, coils, height, width)
         image_coils = ifft2c(kspace_complex)
-        print(f"Image coils shape: {image_coils.shape}")
+        #print(f"Image coils shape: {image_coils.shape}")
         
         # Root Sum of Squares to combine coils: (batch, coils, height, width) -> (batch, height, width)
         image_magnitude = torch.sqrt(torch.sum(torch.abs(image_coils) ** 2, dim=1))
-        print(f"Combined image shape: {image_magnitude.shape}")
+        #print(f"Combined image shape: {image_magnitude.shape}")
         
         # Final verification
         expected_final_shape = (kspace_tensor.shape[0], kspace_tensor.shape[3], kspace_tensor.shape[4])
@@ -245,15 +245,15 @@ class SimpleMRIUNet(nn.Module):
         
         PROPERLY FIXED: All dimension issues resolved.
         """
-        print(f"\n=== SimpleMRIUNet Forward ===")
-        print(f"kspace_masked shape: {kspace_masked.shape}")
-        print(f"mask shape: {mask.shape}")
+        #print(f"\n=== SimpleMRIUNet Forward ===")
+        #print(f"kspace_masked shape: {kspace_masked.shape}")
+        #print(f"mask shape: {mask.shape}")
         
         # Convert k-space to image domain
         image_input = self._kspace_to_image(kspace_masked)
         batch_size = image_input.shape[0]
         
-        print(f"Image after coil combination: {image_input.shape}")
+        #print(f"Image after coil combination: {image_input.shape}")
         
         # Normalize each image individually
         normalized_images = []
@@ -272,7 +272,7 @@ class SimpleMRIUNet(nn.Module):
         if len(image_input.shape) == 3:
             image_input = image_input.unsqueeze(1)
         
-        print(f"Final input to UNet: {image_input.shape}")
+        #print(f"Final input to UNet: {image_input.shape}")
         
         # Final shape verification before U-Net
         if image_input.shape[1] != 1:
@@ -285,7 +285,7 @@ class SimpleMRIUNet(nn.Module):
         if reconstructed.shape[1] == 1:
             reconstructed = reconstructed.squeeze(1)
         
-        print(f"UNet output shape: {reconstructed.shape}")
+        #print(f"UNet output shape: {reconstructed.shape}")
         
         return {
             'output': reconstructed,

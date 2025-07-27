@@ -1,349 +1,182 @@
-# File: deep_fft_debug.py
+#!/usr/bin/env python3
 """
-Deep debug of FFT functions - test all possible implementations and scaling.
-The k-space values are small (max=0.000166) but images are still zero.
+Fixed UNet Inference Script
+Based on debug findings - using forward normalization FFT and proper scaling
 """
 
-import os
-import sys
 import torch
+import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-import h5py
+import sys
+import os
 
 # Add src to path
-sys.path.append(str(Path(__file__).parent / "src"))
+sys.path.append('/home/vchaurasia/projects/mri_fno/src')
 
+from simple_unet import SimpleUNet
 
-def test_all_fft_implementations():
-    """Test all possible FFT implementations and scaling."""
-    print("🔍 TESTING ALL FFT IMPLEMENTATIONS")
+def fft_forward_norm(kspace):
+    """Best FFT implementation from debug - forward normalization"""
+    return torch.fft.ifft2(kspace, norm='forward')
+
+def apply_scaling(image, scale_factor=1e6):
+    """Apply scaling found during debug"""
+    return image * scale_factor
+
+def root_sum_of_squares(tensor, dim=0):
+    """RSS coil combination"""
+    return torch.sqrt(torch.sum(torch.abs(tensor) ** 2, dim=dim))
+
+def load_and_preprocess_data(file_path, slice_idx=17):
+    """Load k-space data for SimpleMRIUNet (expects k-space input, not images)"""
+    print(f"🔄 Loading data from {file_path}, slice {slice_idx}")
+    
+    with h5py.File(file_path, 'r') as f:
+        # Load k-space data
+        kspace = torch.from_numpy(f['kspace'][slice_idx])  # (15, 640, 368)
+        mask = torch.from_numpy(f['mask'][:])  # (368,)
+        
+        print(f"  📊 K-space shape: {kspace.shape}")
+        print(f"  📊 Mask shape: {mask.shape}")
+        print(f"  📊 K-space max: {torch.abs(kspace).max():.6f}")
+        
+        # Apply mask to k-space
+        mask_2d = mask.unsqueeze(0).expand(kspace.shape[-2], -1)  # (640, 368)
+        kspace_masked = kspace * mask_2d.unsqueeze(0)  # (15, 640, 368)
+        
+        print(f"  📊 Masked k-space max: {torch.abs(kspace_masked).max():.6f}")
+        
+        # Convert k-space to real/imaginary format for SimpleMRIUNet
+        # SimpleMRIUNet expects (batch, coils, 2, height, width)
+        kspace_real_imag = torch.stack([kspace_masked.real, kspace_masked.imag], dim=1)  # (15, 2, 640, 368)
+        kspace_real_imag = kspace_real_imag.unsqueeze(0)  # (1, 15, 2, 640, 368)
+        
+        # Expand mask to 2D
+        mask_2d = mask.unsqueeze(0).expand(kspace.shape[-2], -1)  # (640, 368)
+        
+        print(f"  📊 K-space real/imag shape: {kspace_real_imag.shape}")
+        print(f"  📊 Mask 2D shape: {mask_2d.shape}")
+        
+        # Also create reference image using debug method
+        coil_images = fft_forward_norm(kspace_masked)
+        coil_images = apply_scaling(coil_images, scale_factor=1e6)
+        rss_image = root_sum_of_squares(coil_images, dim=0)
+        
+        return {
+            'kspace_masked': kspace_real_imag,  # For SimpleMRIUNet input
+            'mask': mask_2d,                   # 2D mask
+            'reference_image': rss_image,      # For comparison
+            'kspace_full': kspace_real_imag    # Same as masked for now
+        }
+
+def run_unet_inference():
+    """Run UNet inference with fixed preprocessing"""
+    print("🚀 RUNNING FIXED UNET INFERENCE")
     print("=" * 60)
     
-    # Load the k-space data with "good" values
-    data_path = "/scratch/vchaurasia/fastmri_data/test/file1000998.h5"
-    
-    with h5py.File(data_path, 'r') as f:
-        kspace_data = f['kspace'][0]  # First slice
-        
-        print(f"Raw k-space shape: {kspace_data.shape}")
-        print(f"Raw k-space dtype: {kspace_data.dtype}")
-        print(f"Raw k-space max: {np.max(np.abs(kspace_data)):.10f}")
-        print(f"Raw k-space mean: {np.mean(np.abs(kspace_data)):.10f}")
-        print(f"Raw k-space std: {np.std(np.abs(kspace_data)):.10f}")
-        
-        # Check if any values are non-zero
-        non_zero_count = np.count_nonzero(kspace_data)
-        total_count = kspace_data.size
-        print(f"Non-zero elements: {non_zero_count}/{total_count} ({100*non_zero_count/total_count:.2f}%)")
-        
-        if non_zero_count == 0:
-            print("❌ K-space is completely zero - data is corrupted")
-            return test_with_synthetic_data()
-        
-        # Convert to torch
-        kspace_torch = torch.from_numpy(kspace_data)
-        
-        # Test different FFT implementations
-        fft_implementations = []
-        
-        # 1. Basic torch.fft.ifft2
-        def fft_basic(x):
-            return torch.fft.ifft2(x)
-        
-        # 2. Centered IFFT (current implementation)
-        def fft_centered(x):
-            return torch.fft.fftshift(
-                torch.fft.ifft2(
-                    torch.fft.ifftshift(x, dim=(-2, -1)), 
-                    dim=(-2, -1)
-                ), 
-                dim=(-2, -1)
-            )
-        
-        # 3. With ortho normalization
-        def fft_ortho(x):
-            return torch.fft.ifft2(x, norm='ortho')
-        
-        # 4. Centered + ortho
-        def fft_centered_ortho(x):
-            return torch.fft.fftshift(
-                torch.fft.ifft2(
-                    torch.fft.ifftshift(x, dim=(-2, -1)), 
-                    dim=(-2, -1),
-                    norm='ortho'
-                ), 
-                dim=(-2, -1)
-            )
-        
-        # 5. Forward normalization
-        def fft_forward_norm(x):
-            return torch.fft.ifft2(x, norm='forward')
-        
-        # 6. Different shift order
-        def fft_shift_first(x):
-            return torch.fft.ifft2(
-                torch.fft.fftshift(x, dim=(-2, -1)), 
-                dim=(-2, -1)
-            )
-        
-        implementations = [
-            ("Basic IFFT", fft_basic),
-            ("Centered IFFT", fft_centered),
-            ("Ortho normalization", fft_ortho),
-            ("Centered + Ortho", fft_centered_ortho),
-            ("Forward normalization", fft_forward_norm),
-            ("Shift first", fft_shift_first)
-        ]
-        
-        print(f"\n📊 TESTING {len(implementations)} FFT IMPLEMENTATIONS:")
-        print("=" * 60)
-        
-        best_max = 0
-        best_impl = None
-        best_image = None
-        
-        for name, fft_func in implementations:
-            print(f"\n{name}:")
-            
-            try:
-                # Apply IFFT to each coil
-                image_coils = fft_func(kspace_torch)
-                
-                print(f"  Coil images shape: {image_coils.shape}")
-                print(f"  Coil images max: {torch.max(torch.abs(image_coils)):.10f}")
-                print(f"  Coil images mean: {torch.mean(torch.abs(image_coils)):.10f}")
-                
-                # Root sum of squares
-                rss_image = torch.sqrt(torch.sum(torch.abs(image_coils) ** 2, dim=0))
-                
-                print(f"  RSS image max: {torch.max(rss_image):.10f}")
-                print(f"  RSS image mean: {torch.mean(rss_image):.10f}")
-                
-                max_val = torch.max(rss_image).item()
-                if max_val > best_max:
-                    best_max = max_val
-                    best_impl = name
-                    best_image = rss_image.clone()
-                
-                # Check for NaN/Inf
-                if torch.isnan(rss_image).any():
-                    print(f"  ❌ Contains NaN values")
-                elif torch.isinf(rss_image).any():
-                    print(f"  ❌ Contains Inf values")
-                elif max_val > 1e-10:
-                    print(f"  ✅ Has non-zero values")
-                else:
-                    print(f"  ⚠️  Very small values")
-                    
-            except Exception as e:
-                print(f"  ❌ Error: {e}")
-        
-        print(f"\n🏆 BEST IMPLEMENTATION: {best_impl}")
-        print(f"   Best max value: {best_max:.10f}")
-        
-        if best_max > 1e-10:
-            print("✅ Found working FFT implementation!")
-            test_with_scaling(kspace_torch, best_image, best_impl)
-        else:
-            print("❌ All FFT implementations produce near-zero values")
-            test_with_synthetic_data()
-
-
-def test_with_scaling(kspace_torch, best_image, best_impl_name):
-    """Test different scaling approaches."""
-    print(f"\n🔧 TESTING SCALING APPROACHES")
-    print("=" * 50)
-    
-    original_max = torch.max(best_image).item()
-    
-    # Test different scaling factors
-    scaling_factors = [1, 1e3, 1e6, 1e9, 1e12]
-    
-    for scale in scaling_factors:
-        scaled_kspace = kspace_torch * scale
-        
-        # Use the best FFT implementation
-        if "Centered + Ortho" in best_impl_name:
-            image_coils = torch.fft.fftshift(
-                torch.fft.ifft2(
-                    torch.fft.ifftshift(scaled_kspace, dim=(-2, -1)), 
-                    dim=(-2, -1),
-                    norm='ortho'
-                ), 
-                dim=(-2, -1)
-            )
-        else:
-            image_coils = torch.fft.ifft2(scaled_kspace)
-        
-        rss_image = torch.sqrt(torch.sum(torch.abs(image_coils) ** 2, dim=0))
-        max_val = torch.max(rss_image).item()
-        
-        print(f"Scale x{scale:.0e}: max = {max_val:.10f}")
-        
-        if max_val > 0.01:  # Reasonable image values
-            print(f"✅ Found good scaling factor: {scale:.0e}")
-            
-            # Create visualization
-            create_scaling_visualization(scaled_kspace, rss_image, scale)
-            return scale
-    
-    print("❌ No scaling factor produces reasonable image values")
-    return None
-
-
-def test_with_synthetic_data():
-    """Test FFT with synthetic data to verify implementation."""
-    print(f"\n🧪 TESTING WITH SYNTHETIC DATA")
-    print("=" * 50)
-    
-    # Create synthetic k-space data
-    height, width = 64, 64
-    
-    # Create a simple test image
-    test_image = torch.zeros(height, width, dtype=torch.complex64)
-    test_image[height//4:3*height//4, width//4:3*width//4] = 1.0
-    
-    # Forward FFT to get k-space
-    kspace_synthetic = torch.fft.fft2(test_image)
-    
-    print(f"Synthetic k-space max: {torch.max(torch.abs(kspace_synthetic)):.6f}")
-    
-    # Test IFFT implementations
-    implementations = [
-        ("Basic IFFT", lambda x: torch.fft.ifft2(x)),
-        ("Centered IFFT", lambda x: torch.fft.fftshift(
-            torch.fft.ifft2(torch.fft.ifftshift(x, dim=(-2, -1)), dim=(-2, -1)), dim=(-2, -1))),
-        ("Ortho IFFT", lambda x: torch.fft.ifft2(x, norm='ortho')),
-    ]
-    
-    for name, fft_func in implementations:
-        recovered = fft_func(kspace_synthetic)
-        error = torch.mean(torch.abs(test_image - recovered)).item()
-        
-        print(f"{name}:")
-        print(f"  Recovered max: {torch.max(torch.abs(recovered)):.6f}")
-        print(f"  Error: {error:.10f}")
-        
-        if error < 1e-6:
-            print(f"  ✅ Round-trip successful")
-        else:
-            print(f"  ❌ Round-trip failed")
-
-
-def create_scaling_visualization(kspace, image, scale):
-    """Create visualization of successful scaling."""
+    # Paths
+    model_path = "/scratch/vchaurasia/organized_models/unet_epoch20.pth"
+    data_file = "/scratch/vchaurasia/fastmri_data/test/file1000998.h5"
     output_dir = Path("/scratch/vchaurasia/data_debug")
-    output_dir.mkdir(exist_ok=True)
     
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    # Load model
+    print("📋 Loading UNet model...")
+    checkpoint = torch.load(model_path, map_location='cpu')
     
-    # K-space
-    kspace_log = torch.log(torch.abs(kspace[0]) + 1e-12).numpy()
-    axes[0].imshow(kspace_log, cmap='viridis')
-    axes[0].set_title(f'K-space (log)\nScale: {scale:.0e}')
+    # Extract model config
+    config = checkpoint['config']['model']
+    print(f"  📊 Model config: {config}")
+    
+    # Initialize model with correct arguments
+    model = SimpleMRIUNet(
+        n_channels=config.get('in_channels', 2),
+        n_classes=config.get('out_channels', 1),
+        dc_weight=1.0,
+        num_dc_iterations=5
+    )
+    
+    # Load weights
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    
+    print(f"  ✅ Model loaded from epoch {checkpoint['epoch']}")
+    
+    # Load and preprocess data
+    data = load_and_preprocess_data(data_file)
+    
+    # Run inference with SimpleMRIUNet (takes k-space input)
+    print("🧠 Running SimpleMRIUNet inference...")
+    with torch.no_grad():
+        output = model(
+            kspace_masked=data['kspace_masked'],
+            mask=data['mask'],
+            kspace_full=data['kspace_full']
+        )
+        
+        prediction = output['output'].squeeze()  # Remove batch dimension
+        
+        print(f"  📊 Prediction shape: {prediction.shape}")
+        print(f"  📊 Prediction range: [{prediction.min():.6f}, {prediction.max():.6f}]")
+    
+    # Create visualization
+    print("📊 Creating visualization...")
+    
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    
+    # Reference image (zero-filled)
+    axes[0].imshow(data['reference_image'].numpy(), cmap='gray')
+    axes[0].set_title('Zero-filled Reference')
     axes[0].axis('off')
     
-    # Image
-    image_np = image.numpy()
-    axes[1].imshow(image_np, cmap='gray')
-    axes[1].set_title(f'Reconstructed Image\nMax: {torch.max(image):.6f}')
+    # SimpleMRIUNet reconstruction
+    axes[1].imshow(prediction.numpy(), cmap='gray')
+    axes[1].set_title('SimpleMRIUNet Output')
     axes[1].axis('off')
-    
-    # Histogram
-    axes[2].hist(image_np.flatten(), bins=50, alpha=0.7)
-    axes[2].set_title('Image Histogram')
-    axes[2].set_xlabel('Intensity')
-    axes[2].set_ylabel('Count')
     
     plt.tight_layout()
     
-    plot_path = output_dir / f"successful_reconstruction_scale_{scale:.0e}.png"
-    plt.savefig(plot_path, dpi=150, bbox_inches='tight')
-    plt.close()
+    # Save results
+    output_file = output_dir / "simplemriuNet_inference_results.png"
+    plt.savefig(output_file, dpi=150, bbox_inches='tight')
+    print(f"✅ Results saved to: {output_file}")
     
-    print(f"Visualization saved to: {plot_path}")
-
-
-def check_fastmri_reference():
-    """Check if there's a reference reconstruction in the file."""
-    print(f"\n📋 CHECKING FOR REFERENCE RECONSTRUCTION")
-    print("=" * 50)
+    # Save numerical results
+    results = {
+        'prediction': prediction.numpy(),
+        'reference_image': data['reference_image'].numpy(),
+    }
     
-    data_path = "/scratch/vchaurasia/fastmri_data/test/file1000998.h5"
+    np.savez_compressed(output_dir / "simplemriuNet_inference_data.npz", **results)
+    print(f"✅ Numerical data saved to: {output_dir}/simplemriuNet_inference_data.npz")
     
-    with h5py.File(data_path, 'r') as f:
-        print(f"File keys: {list(f.keys())}")
-        
-        # Check if there's a reference reconstruction
-        if 'reconstruction_rss' in f.keys():
-            ref_recon = f['reconstruction_rss'][0]
-            print(f"Reference reconstruction shape: {ref_recon.shape}")
-            print(f"Reference reconstruction max: {np.max(ref_recon):.6f}")
-            
-            if np.max(ref_recon) > 0:
-                print("✅ Reference reconstruction has real values!")
-                
-                # Save reference image
-                output_dir = Path("/scratch/vchaurasia/data_debug")
-                output_dir.mkdir(exist_ok=True)
-                
-                plt.figure(figsize=(8, 8))
-                plt.imshow(ref_recon, cmap='gray')
-                plt.title(f'Reference Reconstruction\nMax: {np.max(ref_recon):.6f}')
-                plt.axis('off')
-                plt.savefig(output_dir / "reference_reconstruction.png", dpi=150, bbox_inches='tight')
-                plt.close()
-                
-                print(f"Reference saved to: {output_dir / 'reference_reconstruction.png'}")
-                return ref_recon
-            else:
-                print("❌ Reference reconstruction is also zero")
-        else:
-            print("❌ No reference reconstruction in file")
-        
-        # Check attributes for scaling info
-        if hasattr(f, 'attrs'):
-            print(f"File attributes: {dict(f.attrs)}")
-        
-        # Check k-space attributes
-        kspace = f['kspace']
-        if hasattr(kspace, 'attrs'):
-            print(f"K-space attributes: {dict(kspace.attrs)}")
+    # Print summary statistics
+    print("\n📊 INFERENCE SUMMARY:")
+    print("=" * 40)
+    print(f"Reference image max:  {data['reference_image'].max():.6f}")
+    print(f"Reference image mean: {data['reference_image'].mean():.6f}")
+    print(f"Prediction max:       {prediction.max():.6f}")
+    print(f"Prediction mean:      {prediction.mean():.6f}")
+    print(f"Difference max:       {(prediction - data['reference_image']).abs().max():.6f}")
     
-    return None
-
-
-def main():
-    """Main function for deep FFT debugging."""
-    print("🔍 DEEP FFT DEBUG - FIND THE REAL ISSUE")
-    print("=" * 70)
-    print("K-space has small values (max=0.000166) but images are still zero")
-    print("Testing all possible FFT implementations and scaling...")
-    print()
+    # Check if prediction makes sense
+    if prediction.max() > 0.001:
+        print("✅ SUCCESS: SimpleMRIUNet is producing reasonable outputs!")
+    else:
+        print("❌ WARNING: SimpleMRIUNet outputs are still very small")
     
-    try:
-        # Check for reference reconstruction first
-        ref_recon = check_fastmri_reference()
-        
-        # Test all FFT implementations
-        test_all_fft_implementations()
-        
-        print(f"\n🎯 SUMMARY:")
-        print("If all FFT implementations fail, the issue is likely:")
-        print("1. K-space data is actually corrupted/empty")
-        print("2. Need different scaling/normalization")
-        print("3. Wrong interpretation of the data format")
-        
-        return 0
-        
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return 1
-
+    return True
 
 if __name__ == "__main__":
-    exit(main())
+    try:
+        success = run_unet_inference()
+        if success:
+            print("\n🎉 UNet inference completed successfully!")
+            print("Check the generated images to verify quality.")
+        else:
+            print("\n❌ UNet inference failed!")
+    except Exception as e:
+        print(f"\n💥 Error during inference: {e}")
+        import traceback
+        traceback.print_exc()

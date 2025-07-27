@@ -98,11 +98,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device):
             target = batch['target'].to(device)
             
             # DEBUG: Check shapes before model call
-            if batch_idx == 0:
-                print(f"Before model call:")
-                print(f"  kspace_masked: {kspace_masked.shape}")
-                print(f"  mask: {mask.shape}")
-                print(f"  target: {target.shape}")
+             
             
             # Zero gradients
             optimizer.zero_grad()
