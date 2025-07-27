@@ -57,17 +57,13 @@ echo ""
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$ORGANIZED_DIR/logs"
 echo "Starting DISCO inference..."
-echo "Command: python src/infer.py --config $CONFIG_PATH --model $MODEL_PATH --output $OUTPUT_DIR --max-samples 100 --save-all --visualize 0 1 2 3 4"
+echo "Command: python scripts/correct_disco_inference.py"
 echo ""
 # Run inference
-python src/infer.py \
-    --config "$CONFIG_PATH" \
-    --model "$MODEL_PATH" \
-    --output "$OUTPUT_DIR" \
-    --device cuda \
-    --max-samples 100 \
-    --save-all \
-    --visualize 0 1 2 3 4
+python scripts/correct_disco_inference.py
+
+
+
 # Check exit status
 if [ $? -eq 0 ]; then
     echo ""

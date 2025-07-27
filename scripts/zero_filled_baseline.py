@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Correct UNet inference using the EXACT same setup as training.
-File: scripts/correct_unet_inference.py
+Zero-filled baseline using EXACTLY the same pipeline as UNet inference.
+This ensures fair comparison by using identical data processing.
+File: scripts/zerofilled_like_unet.py
 """
 
 import os
@@ -11,20 +12,17 @@ import numpy as np
 import h5py
 from pathlib import Path
 from tqdm import tqdm
-import time
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-# Import the EXACT same model class used in training
-from unet_model import MRIUNetModel
 from utils import (
     complex_to_real, real_to_complex, fft2c, ifft2c, 
     root_sum_of_squares, apply_mask
 )
 
 def compute_metrics(prediction, target):
-    """Compute evaluation metrics."""
+    """Compute evaluation metrics - EXACT COPY from UNet inference."""
     pred_np = prediction.squeeze().cpu().numpy()
     target_np = target.squeeze().cpu().numpy()
     
@@ -59,7 +57,7 @@ def compute_metrics(prediction, target):
     }
 
 def create_undersampling_mask(shape, acceleration=4, center_fraction=0.08, seed=None):
-    """Create undersampling mask exactly like in training."""
+    """Create undersampling mask - EXACT COPY from UNet inference."""
     height, width = shape
     
     if seed is not None:
@@ -96,8 +94,8 @@ def create_undersampling_mask(shape, acceleration=4, center_fraction=0.08, seed=
     
     return mask
 
-def process_single_file(file_path, model, device, max_slices=5):
-    """Process a single .h5 file using the EXACT same pipeline as training."""
+def process_single_file(file_path, max_slices=5):
+    """Process file using EXACT same pipeline as UNet, but no neural network."""
     results = []
     
     with h5py.File(file_path, 'r') as f:
@@ -105,10 +103,10 @@ def process_single_file(file_path, model, device, max_slices=5):
         num_slices = min(max_slices, kspace_data.shape[0])
         
         for slice_idx in range(num_slices):
-            # Get k-space for this slice (exactly like training data loader)
+            # EXACT COPY of UNet data processing pipeline
             kspace_full = torch.from_numpy(kspace_data[slice_idx])  # Shape: (coils, height, width)
             
-            # Create undersampling mask (same as training)
+            # Create undersampling mask (same as UNet)
             height, width = kspace_full.shape[-2:]
             mask = create_undersampling_mask(
                 (height, width), 
@@ -120,11 +118,7 @@ def process_single_file(file_path, model, device, max_slices=5):
             # Apply mask to get undersampled k-space
             kspace_masked = apply_mask(kspace_full, mask)
             
-            # Convert to real format (same as training)
-            kspace_full_real = complex_to_real(kspace_full.unsqueeze(0))    # Add batch dim
-            kspace_masked_real = complex_to_real(kspace_masked.unsqueeze(0)) # Add batch dim
-            
-            # Create target image (same as training)
+            # Create target image (EXACT same as UNet)
             image_full = ifft2c(kspace_full)
             target_image = root_sum_of_squares(image_full, dim=0)
             target_image = torch.abs(target_image)
@@ -133,116 +127,54 @@ def process_single_file(file_path, model, device, max_slices=5):
             std = target_image.std()
             target_image = (target_image - mean) / (std + 1e-8)
             
-            # Move to device
-            kspace_masked_real = kspace_masked_real.to(device)
-            mask_batch = mask.unsqueeze(0).to(device)
-            kspace_full_real = kspace_full_real.to(device)
+            # ZERO-FILLED RECONSTRUCTION (instead of neural network)
+            image_masked = ifft2c(kspace_masked)  # Just IFFT of masked k-space
+            zero_filled_reconstruction = root_sum_of_squares(image_masked, dim=0)
+            zero_filled_reconstruction = torch.abs(zero_filled_reconstruction)
             
-            # Forward pass (EXACT same call as training)
-            start_time = time.time()
-            with torch.no_grad():
-                output = model(kspace_masked_real, mask_batch, kspace_full_real)
-                
-                # Extract reconstruction (should be a dict with 'output' key)
-                if isinstance(output, dict) and 'output' in output:
-                    reconstruction = output['output'].squeeze().cpu()
-                else:
-                    reconstruction = output.squeeze().cpu()
+            # Apply SAME normalization as target (this is the key!)
+            zero_filled_reconstruction = (zero_filled_reconstruction - mean) / (std + 1e-8)
             
-            inference_time = time.time() - start_time
-            
-            # Compute metrics
-            metrics = compute_metrics(reconstruction, target_image)
-            metrics['inference_time'] = inference_time
+            # Compute metrics using exact same function as UNet
+            metrics = compute_metrics(zero_filled_reconstruction, target_image)
             
             results.append({
                 'file': file_path.name,
                 'slice': slice_idx,
                 'metrics': metrics,
-                'reconstruction': reconstruction,
+                'reconstruction': zero_filled_reconstruction,
                 'target': target_image
             })
-            # Add this right after the forward pass in your inference script:
-            print(f"Model output range: [{reconstruction.min():.4f}, {reconstruction.max():.4f}]")
-            print(f"Target range: [{target_image.min():.4f}, {target_image.max():.4f}]")
-            print(f"Model output shape: {reconstruction.shape}")
-            print(f"Target shape: {target_image.shape}")
-            print(f"  Slice {slice_idx}: PSNR={metrics['psnr']:.2f}, SSIM={metrics['ssim']:.4f}")
+            
+            print(f"  Slice {slice_idx}: Zero-filled PSNR={metrics['psnr']:.2f}, SSIM={metrics['ssim']:.4f}")
     
     return results
 
 def main():
-    """Main UNet inference using EXACT training setup."""
-    print("=== CORRECT UNET INFERENCE (EXACT TRAINING SETUP) ===")
+    """Main zero-filled baseline using UNet's exact pipeline."""
+    print("=== ZERO-FILLED BASELINE (USING UNET'S EXACT PIPELINE) ===")
     
-    # Setup (same as training)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #model_path = "/scratch/vchaurasia/organized_models/unet_epoch20.pth"
-    model_path = "/scratch/vchaurasia/organized_models/unet/best_model.pth"
     test_data_path = "/scratch/vchaurasia/fastmri_data/test"
-    output_dir = "/scratch/vchaurasia/organized_models/inference_results/unet_correct"
+    output_dir = "/scratch/vchaurasia/organized_models/inference_results/zerofilled_like_unet"
     
-    print(f"Device: {device}")
-    print(f"Model: {model_path}")
+    print(f"Test data: {test_data_path}")
     print(f"Output: {output_dir}")
+    print("Using EXACTLY the same data processing as UNet inference")
     
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    # Load model checkpoint
-    print("Loading UNet checkpoint...")
-    checkpoint = torch.load(model_path, map_location=device)
-    
-    # Get the EXACT config used during training
-    if 'config' in checkpoint:
-        model_config = checkpoint['config']['model']
-        loss_config = checkpoint['config']['loss']
-        
-        print("Model config from training:")
-        for key, value in model_config.items():
-            print(f"  {key}: {value}")
-        
-        # Create model using EXACT same parameters as training
-        model = MRIUNetModel(
-            unet_config={
-                'in_channels': model_config['in_channels'],      # 2
-                'out_channels': model_config['out_channels'],    # 2  
-                'features': model_config['features']             # 64
-            },
-            use_data_consistency=True,
-            dc_weight=loss_config['data_consistency_weight'],   # Same as training
-            num_dc_iterations=5                                 # Same as training
-        ).to(device)
-        
-        print("✅ Model created with EXACT training configuration")
-        
-    else:
-        print("❌ No config found in checkpoint - cannot recreate exact model")
-        return
-    
-    # Load state dict
-    try:
-        model.load_state_dict(checkpoint['model_state_dict'])
-        print("✅ Model weights loaded successfully")
-    except Exception as e:
-        print(f"❌ Error loading state dict: {e}")
-        import traceback
-        traceback.print_exc()
-        return
-    
-    model.eval()
-    
-    # Get test files - CHANGED: Process 100 files like DISCO
+    # Get test files - EXACT same 100 files as UNet
     test_files = list(Path(test_data_path).glob("*.h5"))[:100]  # Process 100 files
     print(f"Processing {len(test_files)} files...")
     
     # Process files
-    all_metrics = {'psnr': [], 'ssim': [], 'nmse': [], 'mae': [], 'inference_time': []}
+    all_metrics = {'psnr': [], 'ssim': [], 'nmse': [], 'mae': []}
     
     for file_path in tqdm(test_files, desc="Processing files"):
         try:
             print(f"\nProcessing: {file_path.name}")
-            file_results = process_single_file(file_path, model, device, max_slices=5)
+            file_results = process_single_file(file_path, max_slices=5)
             
             for result in file_results:
                 metrics = result['metrics']
@@ -255,19 +187,19 @@ def main():
             continue
     
     # Save summary
-    print("\n=== RESULTS SUMMARY ===")
+    print("\n=== ZERO-FILLED BASELINE RESULTS ===")
     summary_file = Path(output_dir) / "summary_metrics.txt"
     
     with open(summary_file, 'w') as f:
-        f.write("Correct UNet Inference Summary\n")
-        f.write("=" * 40 + "\n\n")
-        f.write("Model configuration (from training):\n")
-        if 'config' in checkpoint:
-            for key, value in checkpoint['config']['model'].items():
-                f.write(f"  {key}: {value}\n")
-        f.write("\n")
+        f.write("Zero-filled Baseline (Using UNet's Exact Pipeline)\n")
+        f.write("=" * 50 + "\n\n")
+        f.write("Method: Simple IFFT of undersampled k-space\n")
+        f.write("Data processing: IDENTICAL to UNet inference\n")
+        f.write("Normalization: Same target statistics as UNet uses\n")
+        f.write("Acceleration: 4x\n")
+        f.write("Center fraction: 8%\n\n")
         
-        for metric in ['psnr', 'ssim', 'nmse', 'mae', 'inference_time']:
+        for metric in ['psnr', 'ssim', 'nmse', 'mae']:
             if metric in all_metrics and all_metrics[metric]:
                 values = all_metrics[metric]
                 mean_val = np.mean(values)
@@ -278,19 +210,20 @@ def main():
                 f.write(f"  Std:  {std_val:.6f}\n")
                 f.write(f"  Count: {len(values)}\n\n")
                 
-                print(f"{metric.upper()}: {mean_val:.4f} ± {std_val:.4f}")
+                print(f"Zero-filled {metric.upper()}: {mean_val:.4f} ± {std_val:.4f}")
     
     # Save raw metrics
     np.savez_compressed(Path(output_dir) / "all_metrics.npz", **all_metrics)
     
-    print(f"\n✅ UNet inference completed!")
+    print(f"\n✅ Zero-filled baseline completed!")
     print(f"Results saved to: {output_dir}")
     print(f"Processed {len(all_metrics['psnr'])} samples total")
     
-    # Print training info for reference
-    if 'config' in checkpoint:
-        print(f"\nModel was trained for {checkpoint.get('epoch', 'unknown')} epochs")
-        print(f"Best validation loss: {checkpoint.get('best_val_loss', 'unknown')}")
+    print("\n📊 COMPARISON WITH UNET:")
+    print("UNet PSNR: 18.71 ± 3.42")
+    print(f"Zero-filled PSNR: {np.mean(all_metrics['psnr']):.2f} ± {np.std(all_metrics['psnr']):.2f}")
+    improvement = np.mean(all_metrics['psnr']) - 18.71
+    print(f"UNet improvement: {-improvement:.2f} dB better than zero-filled")
 
 if __name__ == "__main__":
     main()

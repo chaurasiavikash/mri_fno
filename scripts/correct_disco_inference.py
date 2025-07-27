@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Correct UNet inference using the EXACT same setup as training.
-File: scripts/correct_unet_inference.py
+Correct DISCO inference using the EXACT same setup as training.
+File: scripts/correct_disco_inference.py
 """
 
 import os
@@ -17,7 +17,7 @@ import time
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 # Import the EXACT same model class used in training
-from unet_model import MRIUNetModel
+from model import MRIReconstructionModel
 from utils import (
     complex_to_real, real_to_complex, fft2c, ifft2c, 
     root_sum_of_squares, apply_mask
@@ -162,25 +162,21 @@ def process_single_file(file_path, model, device, max_slices=5):
                 'reconstruction': reconstruction,
                 'target': target_image
             })
-            # Add this right after the forward pass in your inference script:
-            print(f"Model output range: [{reconstruction.min():.4f}, {reconstruction.max():.4f}]")
-            print(f"Target range: [{target_image.min():.4f}, {target_image.max():.4f}]")
-            print(f"Model output shape: {reconstruction.shape}")
-            print(f"Target shape: {target_image.shape}")
+            
             print(f"  Slice {slice_idx}: PSNR={metrics['psnr']:.2f}, SSIM={metrics['ssim']:.4f}")
     
     return results
 
 def main():
-    """Main UNet inference using EXACT training setup."""
-    print("=== CORRECT UNET INFERENCE (EXACT TRAINING SETUP) ===")
+    """Main DISCO inference using EXACT training setup."""
+    print("=== CORRECT DISCO INFERENCE (EXACT TRAINING SETUP) ===")
     
     # Setup (same as training)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #model_path = "/scratch/vchaurasia/organized_models/unet_epoch20.pth"
-    model_path = "/scratch/vchaurasia/organized_models/unet/best_model.pth"
+    #model_path = "/scratch/vchaurasia/organized_models/disco_epoch20.pth"
+    model_path = "/scratch/vchaurasia/organized_models/disco/best_model.pth"
     test_data_path = "/scratch/vchaurasia/fastmri_data/test"
-    output_dir = "/scratch/vchaurasia/organized_models/inference_results/unet_correct"
+    output_dir = "/scratch/vchaurasia/organized_models/inference_results/disco_correct"
     
     print(f"Device: {device}")
     print(f"Model: {model_path}")
@@ -190,7 +186,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     
     # Load model checkpoint
-    print("Loading UNet checkpoint...")
+    print("Loading DISCO checkpoint...")
     checkpoint = torch.load(model_path, map_location=device)
     
     # Get the EXACT config used during training
@@ -203,15 +199,21 @@ def main():
             print(f"  {key}: {value}")
         
         # Create model using EXACT same parameters as training
-        model = MRIUNetModel(
-            unet_config={
-                'in_channels': model_config['in_channels'],      # 2
-                'out_channels': model_config['out_channels'],    # 2  
-                'features': model_config['features']             # 64
+        model = MRIReconstructionModel(
+            neural_operator_config={
+                'in_channels': model_config['in_channels'],
+                'out_channels': model_config['out_channels'],
+                'hidden_channels': model_config['hidden_channels'],
+                'num_layers': model_config['num_layers'],
+                'modes': model_config['modes'],
+                'width': model_config.get('width', 64),
+                'dropout': model_config['dropout'],
+                'use_residual': model_config['use_residual'],
+                'activation': model_config['activation']
             },
             use_data_consistency=True,
-            dc_weight=loss_config['data_consistency_weight'],   # Same as training
-            num_dc_iterations=5                                 # Same as training
+            dc_weight=loss_config['data_consistency_weight'],
+            num_dc_iterations=5
         ).to(device)
         
         print("✅ Model created with EXACT training configuration")
@@ -226,14 +228,12 @@ def main():
         print("✅ Model weights loaded successfully")
     except Exception as e:
         print(f"❌ Error loading state dict: {e}")
-        import traceback
-        traceback.print_exc()
         return
     
     model.eval()
     
-    # Get test files - CHANGED: Process 100 files like DISCO
-    test_files = list(Path(test_data_path).glob("*.h5"))[:100]  # Process 100 files
+    # Get test files - Process 20 files (same as UNet)
+    test_files = list(Path(test_data_path).glob("*.h5"))[:100]  # Process 20 files
     print(f"Processing {len(test_files)} files...")
     
     # Process files
@@ -259,13 +259,8 @@ def main():
     summary_file = Path(output_dir) / "summary_metrics.txt"
     
     with open(summary_file, 'w') as f:
-        f.write("Correct UNet Inference Summary\n")
+        f.write("Correct DISCO Inference Summary\n")
         f.write("=" * 40 + "\n\n")
-        f.write("Model configuration (from training):\n")
-        if 'config' in checkpoint:
-            for key, value in checkpoint['config']['model'].items():
-                f.write(f"  {key}: {value}\n")
-        f.write("\n")
         
         for metric in ['psnr', 'ssim', 'nmse', 'mae', 'inference_time']:
             if metric in all_metrics and all_metrics[metric]:
@@ -283,14 +278,9 @@ def main():
     # Save raw metrics
     np.savez_compressed(Path(output_dir) / "all_metrics.npz", **all_metrics)
     
-    print(f"\n✅ UNet inference completed!")
+    print(f"\n✅ DISCO inference completed!")
     print(f"Results saved to: {output_dir}")
     print(f"Processed {len(all_metrics['psnr'])} samples total")
-    
-    # Print training info for reference
-    if 'config' in checkpoint:
-        print(f"\nModel was trained for {checkpoint.get('epoch', 'unknown')} epochs")
-        print(f"Best validation loss: {checkpoint.get('best_val_loss', 'unknown')}")
 
 if __name__ == "__main__":
     main()
